@@ -13,7 +13,7 @@ def convert_to_sketch(image):
 # Main Streamlit app
 def main():
     st.title("Image to Sketch Converter")
-    
+    #
     # File uploader
     uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
