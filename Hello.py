@@ -1,51 +1,37 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022)
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import streamlit as st
-from streamlit.logger import get_logger
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
 
-LOGGER = get_logger(__name__)
+# Function to convert image to sketched image
+def convert_to_sketch(image):
+    img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    img_invert = cv2.bitwise_not(img_gray)
+    final = cv2.divide(img_gray, 255-85 , scale=255)
+    return final
 
+# Main Streamlit app
+def main():
+    st.title("Image to Sketch Converter")
+    
+    # File uploader
+    uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
-def run():
-    st.set_page_config(
-        page_title="Hello",
-        page_icon="👋",
-    )
+    if uploaded_file is not None:
+        # Read image
+        file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
+        image = cv2.imdecode(file_bytes, 1)
+        
+        # Convert image to sketched image
+        sketched_image = convert_to_sketch(image)
+        
+        # Display original and sketched image
+        st.subheader("Original Image")
+        st.image(image, caption='Original Image', use_column_width=True)
+        
+        st.subheader("Sketched Image")
+        st.image(sketched_image, caption='Sketched Image', use_column_width=True)
 
-    st.write("# Welcome to Streamlit! 👋")
-
-    st.sidebar.success("Select a demo above.")
-
-    st.markdown(
-        """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
-        **👈 Select a demo from the sidebar** to see some examples
-        of what Streamlit can do!
-        ### Want to learn more?
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-          forums](https://discuss.streamlit.io)
-        ### See more complex demos
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-          Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-    """
-    )
-
-
+# Run the app
 if __name__ == "__main__":
-    run()
+    main()
